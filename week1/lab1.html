@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Rectangle</title>
+</head>
+<body>
+
+<canvas id="myCanvas" width="1500" height="1000"></canvas>
+
+<script>
+// Get the canvas element by ID
+    canvas = document.getElementById("myCanvas");
+
+// Get the 2D drawing context
+    ctx = canvas.getContext("2d");
+
+    // name
+    ctx.font = "40px Arial";
+    ctx.fillText("Hammad Mubarik", 30, 50);
+
+    // Circle 1
+    ctx.beginPath();
+    ctx.arc(100, 100, 40, 0, 2 * Math.PI);
+    // Set the stroke properties with transparency
+    ctx.lineWidth = 5; // Optional: Set stroke width (default is 1 if not set)
+    ctx.strokeStyle = "rgba(255, 150, 50, 0.5)"; // Set stroke color with 50% transparency (0.5 alpha)
+    // Apply the stroke to the circle
+    ctx.stroke();
+
+    // circle 2
+    ctx.beginPath();
+    ctx.arc(200, 100, 40, 0, 2 * Math.PI);
+    // Set the stroke properties
+    ctx.lineWidth = 5; // Optional: Set stroke width (default is 1 if not set)
+    ctx.strokeStyle = "rgba(255, 150, 50, 0.5)"; // Set stroke color
+    ctx.stroke();
+
+    
+
+    // rectangle 1
+    ctx.fillStyle = "rgba(255, 0, 50, 0.3)"; // Set fill color
+    ctx.fillRect(300, 70, 200, 100); // x, y, width, height
+
+    
+    // Add stroke for the rectangle
+    ctx.lineWidth = 5; // Set stroke width (optional, adjust as needed)
+    ctx.strokeStyle = "rgba(255, 0, 50, 0.5)"; // Set stroke color
+    ctx.strokeRect(300, 70, 200, 100); // Add stroke outline to the rectangle
+
+    // Rectangle 2
+    ctx.fillStyle = "rgba(255, 0, 50, 0.7)"; // Set fill color
+    ctx.fillRect(600, 70, 200, 100); // x, y, width, height
+
+    // Add stroke for the rectangle
+    ctx.lineWidth = 5; // Set stroke width (optional, adjust as needed)
+    ctx.strokeStyle = "rgba(255, 0, 50, 0.5)"; // Set stroke color
+    ctx.strokeRect(600, 70, 200, 100); // Add stroke outline to the rectangle
+
+   
+    // semi- circle
+    // Begin a new path
+    ctx.beginPath()
+    // Draw a semi-circle
+    ctx.arc(950, 140, 50, 0, Math.PI, false); // From 0 to PI for half a circle
+    // Set the fill color
+    ctx.fillStyle = "rgba(200, 100, 50, 0.3)";
+    // Fill the semi-circle
+    ctx.fill();
+
+    // stroke
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(200, 100, 50, 0.7)";
+    ctx.stroke();
+
+    // 3/4 circle
+    // Begin a new path
+    ctx.beginPath();
+    // Draw a 3/4 circle (270 degrees, from 0 to 1.5 * Math.PI)
+    ctx.arc(1100, 140, 50, 0, 1.5 * Math.PI, false); // From 0 to 270 degrees
+    // Set the fill color
+    ctx.fillStyle = "rgba(200, 100, 50, 0.3)";
+    // Fill the 3/4 circle
+    ctx.fill();
+
+    //stroke
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(200, 100, 50, 0.7)";
+    ctx.stroke();
+</script>
+
+</body>
+</html>
