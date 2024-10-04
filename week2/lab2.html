@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Canvas</title>
+
+    <style type="text/css">
+      body {
+        background-color: white;
+      }
+
+      /* Add style for the canvas */
+      #canvas-for-ball {
+        border: 2px solid black;  
+        display: block;  
+        margin-top: 10px;  
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+    <!-- Adding my name as an <h1> heading -->
+    <h1>Hamamd Mubarik</h1>
+
+    <!-- Resize the canvas to 300x300 pixels -->
+    <canvas id="canvas-for-ball" width="300" height="300"></canvas>
+
+    <script type="text/javascript">
+      // Ball class to represent a ball object
+      class Ball {
+        constructor(xpos, ypos, xvel, yvel, radius) {
+          this.xpos = xpos;  // x position
+          this.ypos = ypos;  // y position
+          this.xvel = xvel;  // x velocity
+          this.yvel = yvel;  // y velocity
+          this.radius = radius;  // radius of the ball
+        }
+
+        // Method to move the ball based on its velocity
+        move(canvas) {
+          this.xpos += this.xvel;
+          this.ypos += this.yvel;
+
+          // If the ball hits the bottom of the canvas, reverse the vertical velocity
+          if (this.ypos + this.radius > canvas.height) {
+            this.yvel = -this.yvel;  // Reverse direction to move up
+          }
+
+          // If the ball hits the top of the canvas, reverse the vertical velocity
+          else if (this.ypos - this.radius < 0) {
+            this.yvel = -this.yvel;  // Reverse direction to move down
+          }
+
+          // If the ball hits the right side of the canvas, reverse the horizontal velocity
+          if (this.xpos + this.radius > canvas.width) {
+            this.xvel = -this.xvel;  // Reverse direction to move left
+          }
+
+          // If the ball hits the left side of the canvas, reverse the horizontal velocity
+          else if (this.xpos - this.radius < 0) {
+            this.xvel = -this.xvel;  // Reverse direction to move right
+          }
+        }
+
+        // Method to draw the ball on the canvas
+        draw(ctx) {
+          ctx.beginPath();
+          ctx.arc(this.xpos, this.ypos, this.radius, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
+
+        // Method to resize the ball
+        resize(newRadius) {
+          this.radius = newRadius;
+        }
+      }
+
+      // Gets a handle to the canvas element.
+      var canvas = document.getElementById("canvas-for-ball");
+      var ctx = canvas.getContext("2d");
+
+      // Create an instance of the Ball class
+      var ball = new Ball(50, 50, 2, 2, 10);  // Ball starts at (50, 50), moves diagonally with velocity 2 and radius 10
+
+      // Function to repeat every time the animation loops.
+      function repeatme() {
+        // Clear the entire canvas to remove previous ball positions.
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw the ball based on current position
+        ball.draw(ctx);
+
+        // Move the ball
+        ball.move(canvas);
+
+        // Continue the animation
+        window.requestAnimationFrame(repeatme);
+      }
+
+      // Get the animation going
+      repeatme();
+    </script>
+
+  </body>
+
+</html>
