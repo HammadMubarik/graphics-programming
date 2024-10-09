@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <title>Canvas</title>
+    <style type="text/css">
+        canvas {
+            border: 1px solid grey;
+        }
+    </style>
+</head>
+<body>
+    <p>Hammad Mubarik.</p>
+    <canvas id="canvas-for-ball" width="600" height="400"></canvas>
+
+    <script type="text/javascript">
+        // Get a handle to the canvas element.
+        var canvas = document.getElementById("canvas-for-ball");
+        // Get the 2D context.
+        var ctx = canvas.getContext("2d");
+
+        // Paddle class definition
+        class Paddle {
+            constructor(x, y, width, height, color) {
+                this.x = x; // X-coordinate
+                this.y = y; // Y-coordinate
+                this.width = width; // Paddle width
+                this.height = height; // Paddle height
+                this.color = color; // Paddle color
+                this.dx = 10; // Speed of paddle horizontal movement (step size)
+            }
+
+            // Draw the paddle as a rectangle
+            draw(ctx) {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+            }
+
+            // Move the paddle left
+            moveLeft() {
+                if (this.x > 0) {
+                    this.x -= this.dx;
+                }
+            }
+
+            // Move the paddle right
+            moveRight() {
+                if (this.x + this.width < canvas.width) {
+                    this.x += this.dx;
+                }
+            }
+
+            // Move paddle to the mouse's x-coordinate
+            moveToMouse(mouseX) {
+                if (mouseX > 0 && mouseX < canvas.width - this.width) {
+                    this.x = mouseX;
+                }
+            }
+        }
+
+        // Ball class definition
+        class Ball {
+            constructor(x, y, radius, color) {
+                this.x = x; // X-coordinate
+                this.y = y; // Y-coordinate
+                this.radius = radius; // Ball radius
+                this.color = color; // Ball color
+                this.dx = 4; // Speed of ball movement in X direction
+                this.dy = 4; // Speed of ball movement in Y direction
+            }
+
+            // Draw the ball
+            draw(ctx) {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            // Move the ball and handle wall collisions
+            move(paddle1, paddle2) {
+                this.x += this.dx;
+                this.y += this.dy;
+
+                // Check for collisions with the top and bottom walls
+                if (this.y - this.radius <= 0 || this.y + this.radius >= canvas.height) {
+                    this.reset(); // Reset the ball if it hits the top or bottom
+                }
+
+                // Paddle collision with Paddle 1 (top paddle)
+                if (this.x + this.radius > paddle1.x &&
+                    this.x - this.radius < paddle1.x + paddle1.width &&
+                    this.y + this.radius > paddle1.y &&
+                    this.y - this.radius < paddle1.y + paddle1.height) {
+                    this.dy = -this.dy; // Reverse Y direction
+                    this.y = paddle1.y + paddle1.height + this.radius; // Position the ball below Paddle 1
+                }
+
+                // Paddle collision with Paddle 2 (bottom paddle)
+                if (this.x + this.radius > paddle2.x &&
+                    this.x - this.radius < paddle2.x + paddle2.width &&
+                    this.y + this.radius > paddle2.y &&
+                    this.y - this.radius < paddle2.y + paddle2.height) {
+                    this.dy = -this.dy; // Reverse Y direction
+                    this.y = paddle2.y - this.radius; // Position the ball above Paddle 2
+                }
+
+                // Wall collision (left and right)
+                if (this.x + this.radius >= canvas.width) {
+                    this.x = canvas.width - this.radius; // Keep the ball within bounds
+                    this.dx = -this.dx; // Reverse X direction
+                }
+                if (this.x - this.radius <= 0) {
+                    this.x = this.radius; // Keep the ball within bounds
+                    this.dx = -this.dx; // Reverse X direction
+                }
+            }
+
+            // Reset the ball to the center and randomize direction
+            reset() {
+                this.x = canvas.width / 2;
+                this.y = canvas.height / 2;
+
+                // Randomize direction for reset
+                this.dx = Math.random() < 0.5 ? 4 : -4; // Random horizontal direction
+                this.dy = Math.random() < 0.5 ? 4 : -4; // Random vertical direction
+            }
+        }
+
+        // Create a new paddle and ball
+        var paddle1 = new Paddle(250, 10, 100, 10, 'blue'); // Top paddle
+        var paddle2 = new Paddle(250, canvas.height - 20, 100, 10, 'red'); // Bottom paddle
+        var ball = new Ball(canvas.width / 2, canvas.height / 2, 10, 'green');
+
+        // Function to update and redraw the paddles and ball
+        function updateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+            paddle1.draw(ctx); // Draw the first paddle
+            paddle2.draw(ctx); // Draw the second paddle
+            ball.draw(ctx); // Draw the ball
+            ball.move(paddle1, paddle2); // Move the ball and check for collisions
+        }
+
+        // Listen for keypresses with jQuery
+        $(document.body).on('keydown', function (e) {
+            switch (e.which) {
+                // Paddle 1 (top paddle)
+                // Left arrow
+                case 37:
+                    paddle1.moveLeft();
+                    updateCanvas();
+                    break;
+
+                // Right arrow
+                case 39:
+                    paddle1.moveRight();
+                    updateCanvas();
+                    break;
+
+                // Paddle 2 (bottom paddle)
+                // A key for left
+                case 65: // A
+                    paddle2.moveLeft();
+                    updateCanvas();
+                    break;
+
+                // D key for right
+                case 68: // D
+                    paddle2.moveRight();
+                    updateCanvas();
+                    break;
+            }
+        });
+
+        // Track mouse movement and move the first paddle accordingly
+        $(canvas).on('mousemove', function (e) {
+            var mouseX = e.clientX - canvas.getBoundingClientRect().left;
+            paddle1.moveToMouse(mouseX);
+            updateCanvas();
+        });
+
+        // Initial draw
+        updateCanvas();
+
+        // Game loop to continuously update the canvas
+        setInterval(updateCanvas, 1000 / 60); // Update at 60 FPS
+    </script>
+</body>
+</html>
