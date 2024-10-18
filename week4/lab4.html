@@ -28,6 +28,7 @@
                 this.radius = radius; // Paddle radius
                 this.color = color; // Paddle color
                 this.dx = 10; // Speed of paddle horizontal movement (step size)
+                this.score = 0; // Initialize score for each paddle
             }
 
             // Draw the paddle as a circle
@@ -37,6 +38,13 @@
                 ctx.fillStyle = this.color;
                 ctx.fill();
                 ctx.closePath();
+            }
+
+            // Display the score above the paddle
+            drawScore(ctx) {
+                ctx.font = "20px Arial";
+                ctx.fillStyle = "black";
+                ctx.fillText(`Score: ${this.score}`, this.x - 25, this.y - 10); // Adjust position for score display
             }
 
             moveLeft() {
@@ -90,10 +98,12 @@
                 if (this.x + this.radius >= canvas.width) {
                     this.x = canvas.width - this.radius;
                     this.dx = -this.dx;
+                    paddle1.score--; // Decrement score for paddle1 (top) if ball hits right wall
                 }
                 if (this.x - this.radius <= 0) {
                     this.x = this.radius;
                     this.dx = -this.dx;
+                    paddle2.score--; // Decrement score for paddle2 (bottom) if ball hits left wall
                 }
 
                 // Top and bottom collision (reset if it hits the walls)
@@ -116,17 +126,23 @@
 
                 if (distance < this.radius + paddle.radius) {
                     // Collision detected with paddle
-                    // Reverse the ball's direction (simplified rebound)
-                    this.dx = -this.dx;
+                    
+                    // Reverse vertical direction (dy) to simulate a bounce
                     this.dy = -this.dy;
 
-                    // Adjust ball position to prevent sticking inside the paddle
+                    // Modify horizontal direction (dx) based on where the ball hits the paddle
+                    var hitPosition = (this.x - paddle.x) / paddle.radius; // Value between -1 (left) and 1 (right)
+                    this.dx += hitPosition * 2; // Adjust dx based on hit position
+
+                    // Ensure the ball doesn't get stuck inside the paddle
                     if (this.y < paddle.y) {
                         this.y = paddle.y - paddle.radius - this.radius; // Ball above paddle
                     } else {
                         this.y = paddle.y + paddle.radius + this.radius; // Ball below paddle
-
                     }
+
+                    // Increase the paddle's score when it touches the ball
+                    paddle.score++;
 
                     // Display collision message
                     displayCollisionMessage("Collision Detected!");
@@ -173,6 +189,8 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
             paddle1.draw(ctx);
             paddle2.draw(ctx);
+            paddle1.drawScore(ctx); // Draw the score for the blue paddle
+            paddle2.drawScore(ctx); // Draw the score for the red paddle
             ball.draw(ctx);
             ball.move(paddle1, paddle2);
 
