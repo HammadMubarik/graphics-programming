@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<!-- Import Three.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Three.js Sphere Example</title>
+    <style type="text/css">
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+
+<body>
+    <h1>Hammad</h1>
+    <script type="text/javascript">
+        // Create the scene
+        var scene = new THREE.Scene();
+
+        // Create a camera with a field of view of 80, aspect ratio based on window size, and near/far clipping planes
+        var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        // Set the camera's z-position to make sure it's not inside the sphere
+        camera.position.z = 6;  // Move it further away from the sphere
+
+        // Create a WebGL renderer and set its size based on the window size (width and height)
+        var renderer = new THREE.WebGLRenderer();
+
+        // Apply canvas width and height parameters by setting the renderer size
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        // Append the renderer's canvas to the body
+        document.body.appendChild(renderer.domElement);
+
+        // Create a sphere geometry
+        var geometry = new THREE.IcosahedronGeometry(1, 2); // Radius: 1, Detail: 2 (Experiment with this)
+
+        // Create a basic material for the sphere (no lighting, just a flat color)
+        var material = new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: true });
+
+        // Create the mesh by combining the geometry and material
+        var sphere = new THREE.Mesh(geometry, material);
+
+        // Add the sphere to the scene
+        scene.add(sphere);
+
+        // Define the repeatMe() loop function to rotate the sphere
+        function repeatMe() {
+            // Rotate the sphere on the x and y axes
+            sphere.rotation.x += 0.01;
+            sphere.rotation.y += 0.01;
+
+            // Render the scene from the camera's point of view
+            renderer.render(scene, camera);
+
+            // Call the repeatMe function recursively for continuous animation
+            requestAnimationFrame(repeatMe);
+        }
+
+        // Start the repeatMe loop
+        repeatMe();
+    </script>
+</body>
+
+</html>
