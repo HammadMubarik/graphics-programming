@@ -35,10 +35,10 @@
         document.body.appendChild(renderer.domElement);
 
         // Create a sphere geometry
-        var geometry = new THREE.IcosahedronGeometry(1, 2); // Radius: 1, Detail: 2 (Experiment with this)
+        var geometry = new THREE.IcosahedronGeometry(1, 2); // Radius: 1, Detail: 2
 
-        // Create a basic material for the sphere (no lighting, just a flat color)
-        var material = new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: true });
+        // Create a basic material for the sphere and disable wireframe
+        var material = new THREE.MeshBasicMaterial({ color: 0x0000ff, wireframe: false });
 
         // Create the mesh by combining the geometry and material
         var sphere = new THREE.Mesh(geometry, material);
