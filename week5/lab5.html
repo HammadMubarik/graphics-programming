@@ -6,8 +6,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Three.js Sphere Example with Spotlight and Lambert Material</title>
-    <style type="text/css">
+    <title>Three.js Continuous Bouncing Sphere</title>
+    <style>
         body { margin: 0; }
         canvas { display: block; }
     </style>
@@ -15,61 +15,84 @@
 
 <body>
     <h1>Hammad</h1>
-    <script type="text/javascript">
-        // Create the scene
+    <script>
+        // Create the scene and camera
         var scene = new THREE.Scene();
-
-        // Create a camera with a field of view of 80, aspect ratio based on window size, and near/far clipping planes
         var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 6; // Position the camera behind the sphere
 
-        // Set the camera's z-position to make sure it's not inside the sphere
-        camera.position.z = 6;  // Move it further away from the sphere
-
-        // Create a WebGL renderer and set its size based on the window size (width and height)
-        var renderer = new THREE.WebGLRenderer();
-
-        // Apply canvas width and height parameters by setting the renderer size
+        // Set up the renderer
+        var renderer = new THREE.WebGLRenderer({ alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-
-        // Append the renderer's canvas to the body
+        renderer.shadowMap.enabled = true; // Enable shadows
         document.body.appendChild(renderer.domElement);
 
-        // Create a sphere geometry
-        var geometry = new THREE.IcosahedronGeometry(1, 2); // Radius: 1, Detail: 2
+        // Sphere class definition
+        class Sphere {
+            constructor(radius, detail, color) {
+                this.geometry = new THREE.IcosahedronGeometry(radius, detail);
+                this.material = new THREE.MeshLambertMaterial({ color: color });
+                this.mesh = new THREE.Mesh(this.geometry, this.material);
+                this.mesh.castShadow = true; // Enable sphere to cast shadows
+                scene.add(this.mesh);
+                
+                // Initial position and physics properties
+                this.mesh.position.set(0, 2, 0);
+                this.velocityY = 0; // Vertical velocity
+                this.gravity = -0.05; // Gravity effect
+                this.bounceFactor = 0.9; // Energy loss on bounce
+            }
 
-        // Change the material to MeshLambertMaterial for light interaction
-        var material = new THREE.MeshLambertMaterial({ color: 0x0000ff });
+            // Update sphere position based on physics
+            update() {
+                this.velocityY += this.gravity; // Apply gravity
+                this.mesh.position.y += this.velocityY; // Update position
 
-        // Create the mesh by combining the geometry and material
-        var sphere = new THREE.Mesh(geometry, material);
+                // Check for collision with the plane
+                if (this.mesh.position.y <= -1 + this.geometry.parameters.radius) {
+                    this.mesh.position.y = -1 + this.geometry.parameters.radius; // Reset position
+                    this.velocityY *= -this.bounceFactor; // Reverse velocity for bounce
+                }
+            }
 
-        // Add the sphere to the scene
-        scene.add(sphere);
-
-        // Add a spotlight
-        var spotLight = new THREE.SpotLight(0xffffff); // White light
-        // Set the spotlight's position in the scene
-        spotLight.position.set(5, 5, 5);  // (x, y, z) coordinates
-
-        // Add the spotlight to the scene
-        scene.add(spotLight);
-
-        // Define the repeatMe() loop function to rotate the sphere
-        function repeatMe() {
-            // Rotate the sphere on the x and y axes
-            sphere.rotation.x += 0.01;
-            sphere.rotation.y += 0.01;
-
-            // Render the scene from the camera's point of view
-            renderer.render(scene, camera);
-
-            // Call the repeatMe function recursively for continuous animation
-            requestAnimationFrame(repeatMe);
+            // Rotate the sphere
+            rotate() {
+                this.mesh.rotation.x += 0.01;
+                this.mesh.rotation.y += 0.01;
+            }
         }
 
-        // Start the repeatMe loop
-        repeatMe();
+        // Create a new sphere instance
+        var sphere = new Sphere(1, 2, 0x0000ff); // Radius: 1, Detail: 2, Color: Blue
+
+        // Add a plane (ground) below the sphere
+        var planeGeometry = new THREE.PlaneGeometry(20, 20);
+        var planeMaterial = new THREE.ShadowMaterial({ opacity: 0.5 });
+        var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+        plane.rotation.x = -Math.PI / 2; // Rotate to horizontal
+        plane.position.y = -1; // Position below the sphere
+        plane.receiveShadow = true; // Enable the plane to receive shadows
+        scene.add(plane);
+
+        // Add a spotlight
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(5, 5, 5);
+        spotLight.castShadow = true;
+        scene.add(spotLight);
+
+        // Add a helper for the spotlight
+        var helper = new THREE.SpotLightHelper(spotLight);
+        scene.add(helper);
+
+        // Animation loop
+        function repeatMe() {
+            sphere.update(); // Update sphere position
+            sphere.rotate(); // Rotate sphere
+            renderer.render(scene, camera); // Render the scene
+            requestAnimationFrame(repeatMe); // Call again for continuous animation
+        }
+
+        repeatMe(); // Start the animation loop
     </script>
 </body>
-
 </html>

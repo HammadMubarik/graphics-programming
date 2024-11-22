@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>D3.js CO2 Data Plot</title>
+    <meta charset="UTF-8">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .axis path, .axis line {
+            fill: none;
+            stroke: black;
+            shape-rendering: crispEdges;
+        }
+        .axis text {
+            font-size: 14px;
+        }
+        .chart-label {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1> Hammad Ahmad Mubarik</h1>
+    <h1>CO2 Levels Over Time</h1>
+    <div id="chart"></div>
+
+    <script type="text/javascript">
+        function plotCO2Data() {
+            // Sample JSON data
+            const data = [
+                { "yearsAgo": 100, "co2": 280 },
+                { "yearsAgo": 90, "co2": 290 },
+                { "yearsAgo": 80, "co2": 300 },
+                { "yearsAgo": 70, "co2": 320 },
+                { "yearsAgo": 60, "co2": 330 },
+                { "yearsAgo": 50, "co2": 340 },
+                { "yearsAgo": 40, "co2": 360 },
+                { "yearsAgo": 30, "co2": 380 },
+                { "yearsAgo": 20, "co2": 400 },
+                { "yearsAgo": 10, "co2": 415 },
+                { "yearsAgo": 0, "co2": 420 }
+            ];
+
+            // Step 5.1: Set up SVG size and margins
+            const margin = { top: 40, right: 20, bottom: 60, left: 80 };
+            const width = 800 - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+
+            // Create SVG element
+            const svg = d3.select("#chart")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            // Step 5.2: Create scales
+            const xScale = d3.scaleLinear()
+                .domain(d3.extent(data, d => d.yearsAgo)) // Min and max years
+                .range([0, width]);
+
+            const yScale = d3.scaleLinear()
+                .domain([d3.min(data, d => d.co2) - 10, d3.max(data, d => d.co2) + 10]) // Buffer for y-axis
+                .range([height, 0]);
+
+            // Step 5.3: Create axes
+            const xAxis = d3.axisBottom(xScale).ticks(10); // 10 ticks for years ago
+            const yAxis = d3.axisLeft(yScale).ticks(10);   // 10 ticks for CO2 levels
+
+            // Create the line generator
+            const line = d3.line()
+                .x(d => xScale(d.yearsAgo))
+                .y(d => yScale(d.co2))
+                .curve(d3.curveMonotoneX); // Smooth curve
+
+            // Step 5.4: Append axes to the SVG
+            svg.append("g")
+                .attr("transform", `translate(0, ${height})`) // Move x-axis to bottom
+                .call(xAxis);
+
+            svg.append("g")
+                .call(yAxis);
+
+            // Step 5.5: Add the line path to the SVG
+            svg.append("path")
+                .datum(data)
+                .attr("fill", "none") // Remove fill
+                .attr("stroke", "red") // Make line red
+                .attr("stroke-width", 2)
+                .attr("d", line);
+
+            // Step 5.7: Add labels and chart title
+            svg.append("text")
+                .attr("class", "chart-label")
+                .attr("x", width / 2)
+                .attr("y", -10)
+                .attr("text-anchor", "middle")
+                .text("CO2 Levels Over Time");
+
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", height + 40)
+                .attr("text-anchor", "middle")
+                .style("font-size", "14px")
+                .text("Years Ago");
+
+            svg.append("text")
+                .attr("x", -height / 2)
+                .attr("y", -50)
+                .attr("text-anchor", "middle")
+                .attr("transform", "rotate(-90)")
+                .style("font-size", "14px")
+                .text("CO2 Levels (ppm)");
+        }
+
+        // Call the function to plot data
+        plotCO2Data();
+    </script>
+</body>
+</html>
